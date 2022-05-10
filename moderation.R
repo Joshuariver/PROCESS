@@ -39,3 +39,34 @@ df <- mutate(df, 외관 = (외관1+외관2+외관3)/3, 편의성 = (편의성1+�
 process(data = df,y = "만족감", x = "외관",w = "브랜드", model = 1, plot = 1, 
         modelbt = 1, boot = 5000, seed = 654321, jn = 1, center = 2)
 
+
+process(data = df,y = "만족감", x = "편의성",w = "브랜드", model = 1, plot = 1, 
+        modelbt = 1, boot = 5000, seed = 654321, jn = 1, center = 2)
+
+process(data = df,y = "만족감", x = "유용성",w = "브랜드", model = 1, plot = 1, 
+        modelbt = 1, boot = 5000, seed = 654321, jn = 1, center = 2)
+
+# Plotting
+
+required <- c("survey", "huxtable", "sandwich", "cowplot")
+if (!all(sapply(required, requireNamespace, quietly = TRUE)))
+  knitr::opts_chunk$set(eval = FALSE)
+knitr::opts_chunk$set(message = F, warning = F, fig.width = 6, fig.height = 5)
+library(jtools)
+library(interactions)
+
+
+
+fiti <- lm(만족감 ~ 유용성 * 브랜드 , data = df)
+summ(fiti)
+
+interact_plot(fiti, pred = 유용성, modx = 브랜드, johnson_neyman = TRUE)
+
+interact_plot(fiti, pred = 유용성, modx = 브랜드, linearity.check = TRUE, plot.points = TRUE)
+
+
+ss <- sim_slopes(fiti, pred = 유용성, modx = 브랜드, 
+                 modx.values = c(0, 5, 10))
+plot(ss)
+
+johnson_neyman(fiti, pred = 유용성, modx = 브랜드, alpha = .05)
